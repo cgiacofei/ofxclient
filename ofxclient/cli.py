@@ -21,6 +21,13 @@ DOWNLOAD_DAYS = 30
 
 GlobalConfig = None
 
+try:
+    # python 3
+    from io import StringIO
+    IS_PYTHON_2 = False
+except ImportError:
+    # python 2
+    IS_PYTHON_2 = True
 
 def run():
     global GlobalConfig
@@ -53,7 +60,10 @@ def run():
                 ofxdata = a.download(days=args.download_days)
             else:
                 ofxdata = combined_download(accounts, days=args.download_days)
-            args.download.write(ofxdata.read())
+            if IS_PYTHON_2:
+                args.download.write(ofxdata.read())
+            else:
+                args.download.write(ofxdata.read().encode())
             if args.open:
                 open_with_ofx_handler(args.download.name)
             sys.exit(0)
